@@ -1,0 +1,71 @@
+{
+  "profile": {
+    "name": "linhmeooo",
+    "username": "@linhmeooo",
+    "bio": "✨ Welcome to my digital space | Developer & Creator ✨",
+    "badges": ["verified", "developer", "premium"],
+    "avatarUrl": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80",
+    "statusText": "Coding & listening to music 🎧",
+    "viewsCount": 1428
+  },
+  "appearance": {
+    "backgroundType": "image",
+    "backgroundUrl": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1920&q=80",
+    "backgroundBlur": 4,
+    "backgroundDim": 45,
+    "accentColor": "#a855f7",
+    "cardOpacity": 35,
+    "particleEffect": "snow",
+    "enable3DTilt": true,
+    "enableTypewriter": true,
+    "layoutStyle": "both",
+    "enterScreenText": "click to enter..."
+  },
+  "audio": {
+    "enabled": true,
+    "title": "Lofi Chill Night - Ambient",
+    "artist": "Chillhop Music",
+    "audioUrl": "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3",
+    "coverUrl": "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=200&q=80",
+    "volume": 0.5
+  },
+  "links": [
+    {
+      "id": "link-1",
+      "url": "https://github.com/linhmeooo",
+      "title": "GitHub",
+      "subtitle": "Xem các dự án mã nguồn mở của mình"
+    },
+    {
+      "id": "link-2",
+      "url": "https://facebook.com/linhmeooo",
+      "title": "Facebook",
+      "subtitle": "Kết nối qua trang cá nhân"
+    },
+    {
+      "id": "link-3",
+      "url": "https://instagram.com/linhmeooo",
+      "title": "Instagram",
+      "subtitle": "@linhmeooo • Daily moments"
+    },
+    {
+      "id": "link-4",
+      "url": "https://tiktok.com/@linhmeooo",
+      "title": "TikTok",
+      "subtitle": "Video ngắn & chia sẻ thú vị"
+    },
+    {
+      "id": "link-5",
+      "url": "https://discord.gg/invite",
+      "title": "Discord Server",
+      "subtitle": "Tham gia cộng đồng trò chuyện"
+    },
+    {
+      "id": "link-6",
+      "url": "https://open.spotify.com",
+      "title": "Spotify Playlist",
+      "subtitle": "Nhạc mình hay nghe mỗi ngày"
+    }
+  ]
+}
+
