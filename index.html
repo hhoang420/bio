@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>linhmeooo | Bio Link</title>
+  <meta name="description" content="Personal Bio Link Profile - Inspired by guns.lol" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- FontAwesome 6 Free (for brand & UI icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <!-- Dynamic Background Layer -->
+  <div id="bg-container" class="bg-container">
+    <div id="bg-image" class="bg-media"></div>
+    <video id="bg-video" class="bg-media hidden" autoplay loop muted playsinline></video>
+    <div id="bg-overlay" class="bg-overlay"></div>
+  </div>
+
+  <!-- Particle Canvas Layer -->
+  <canvas id="particle-canvas" class="particle-canvas"></canvas>
+
+  <!-- "Click to Enter" Splash Overlay (guns.lol signature) -->
+  <div id="enter-overlay" class="enter-overlay" role="button" tabindex="0" aria-label="Click to enter profile">
+    <div class="enter-content">
+      <p id="enter-text" class="enter-text">click to enter...</p>
+      <span class="enter-subtext">Nhấn bất kỳ đâu để vào trang & phát nhạc</span>
+    </div>
+  </div>
+
+  <!-- Floating Top-Right Action Bar -->
+  <div class="top-controls">
+    <button id="btn-mute" class="icon-btn" title="Bật/Tắt âm thanh (M)" aria-label="Toggle Mute">
+      <i class="fa-solid fa-volume-high"></i>
+    </button>
+    <button id="btn-share" class="icon-btn" title="Sao chép link trang cá nhân" aria-label="Share Profile">
+      <i class="fa-solid fa-share-nodes"></i>
+    </button>
+    <button id="btn-open-editor" class="icon-btn editor-trigger" title="Tùy chỉnh trang Bio (Chỉ dành cho bạn)" aria-label="Open Settings">
+      <i class="fa-solid fa-sliders"></i>
+      <span>Tùy chỉnh</span>
+    </button>
+  </div>
+
+  <!-- Main Center Container -->
+  <main class="main-stage">
+    <section id="profile-card" class="profile-card">
+      <!-- Card Top Header: Views -->
+      <div class="card-meta-bar">
+        <div class="meta-pill" title="Lượt xem trang">
+          <i class="fa-regular fa-eye"></i>
+          <span id="profile-views">1,428</span>
+        </div>
+      </div>
+
+      <!-- Avatar & Glow Ring -->
+      <div class="avatar-wrapper">
+        <div class="avatar-glow"></div>
+        <img id="profile-avatar" class="profile-avatar" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" alt="Avatar" />
+        <span class="status-dot" title="Online"></span>
+      </div>
+
+      <!-- Name & Badges -->
+      <div class="identity-block">
+        <div class="name-row">
+          <h1 id="profile-name" class="profile-name">linhmeooo</h1>
+          <div id="profile-badges" class="badges-list"></div>
+        </div>
+        <p id="profile-username" class="profile-username">@linhmeooo</p>
+      </div>
+
+      <!-- Bio / Typewriter Text -->
+      <div class="bio-wrapper">
+        <p id="profile-bio" class="profile-bio"></p>
+        <span id="typewriter-cursor" class="typewriter-cursor">|</span>
+      </div>
+
+      <!-- Custom Status Pill -->
+      <div id="status-box" class="status-box">
+        <i class="fa-solid fa-sparkles status-icon"></i>
+        <span id="profile-status">Coding & listening to music 🎧</span>
+      </div>
+
+      <!-- Quick Icon Row (guns.lol glowing icon bar) -->
+      <div id="social-icon-row" class="social-icon-row" aria-label="Quick social icons"></div>
+
+      <!-- Detailed Links List (Cards with auto-detected icons) -->
+      <div id="links-list" class="links-list" aria-label="Social and website links"></div>
+
+      <!-- Built-in Music Player Widget (Supports both YouTube Links & MP3) -->
+      <div id="audio-widget" class="audio-widget">
+        <img id="audio-cover" class="audio-cover" src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=200&q=80" alt="Song Cover" />
+        <div class="audio-info">
+          <div class="audio-title-row">
+            <span id="audio-title" class="audio-title">Lofi Chill Night</span>
+            <span id="audio-artist" class="audio-artist">Chillhop Music</span>
+          </div>
+          <div class="audio-progress-row">
+            <span id="audio-current" class="audio-time">0:00</span>
+            <input id="audio-seek" type="range" class="audio-seek" min="0" max="100" value="0" step="0.1" aria-label="Seek audio" />
+            <span id="audio-duration" class="audio-time">0:00</span>
+          </div>
+        </div>
+        <div class="audio-controls">
+          <button id="audio-play-btn" class="audio-play-btn" aria-label="Play or Pause Music">
+            <i class="fa-solid fa-play"></i>
+          </button>
+        </div>
+        <audio id="bg-audio" preload="metadata" loop crossorigin="anonymous"></audio>
+        <div id="yt-player-container" class="yt-hidden-player" aria-hidden="true">
+          <div id="yt-player"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+  <!-- Live Customization Drawer (Studio Editor) -->
+  <aside id="editor-drawer" class="editor-drawer hidden" aria-label="Bảng tùy chỉnh trang Bio">
+    <div class="editor-backdrop" id="editor-backdrop"></div>
+    <div class="editor-panel">
+      <header class="editor-header">
+        <div>
+          <h2><i class="fa-solid fa-wand-magic-sparkles"></i> Tùy chỉnh Bio Link</h2>
+          <p>Thay đổi hiển thị ngay lập tức • Tự động nhận diện icon từ URL</p>
+        </div>
+        <button id="btn-close-editor" class="close-btn" aria-label="Đóng bảng cài đặt">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </header>
+
+      <!-- Editor Navigation Tabs -->
+      <nav class="editor-tabs">
+        <button class="tab-btn active" data-tab="tab-links">
+          <i class="fa-solid fa-link"></i> Liên kết (Links)
+        </button>
+        <button class="tab-btn" data-tab="tab-profile">
+          <i class="fa-regular fa-id-badge"></i> Hồ sơ
+        </button>
+        <button class="tab-btn" data-tab="tab-bg">
+          <i class="fa-regular fa-image"></i> Ảnh nền & Hiệu ứng
+        </button>
+        <button class="tab-btn" data-tab="tab-music">
+          <i class="fa-solid fa-music"></i> Nhạc nền
+        </button>
+        <button class="tab-btn" data-tab="tab-publish">
+          <i class="fa-brands fa-github"></i> Xuất lên GitHub
+        </button>
+      </nav>
+
+      <div class="editor-body">
+        <!-- TAB 1: LINKS MANAGER (with Auto Icon Detection) -->
+        <div id="tab-links" class="tab-pane active">
+          <div class="add-link-card">
+            <h3><i class="fa-solid fa-plus-circle"></i> Thêm liên kết mới</h3>
+            <p class="helper-text">Chỉ cần dán URL (Facebook, TikTok, GitHub, Discord, YouTube, hoặc bất kỳ web nào), hệ thống sẽ <strong>tự động hiện đúng Icon và gợi ý tên</strong>!</p>
+
+            <div class="url-input-group">
+              <div id="detected-icon-preview" class="detected-icon-preview" title="Icon tự động nhận diện">
+                <i class="fa-solid fa-globe"></i>
+              </div>
+              <input type="url" id="new-link-url" placeholder="Dán link vào đây (VD: https://facebook.com/tenban)..." />
+            </div>
+
+            <div class="form-row-2">
+              <div class="form-group">
+                <label for="new-link-title">Tiêu đề hiển thị (Tự động điền nếu để trống)</label>
+                <input type="text" id="new-link-title" placeholder="VD: Facebook cá nhân" />
+              </div>
+              <div class="form-group">
+                <label for="new-link-subtitle">Mô tả phụ (Tùy chọn)</label>
+                <input type="text" id="new-link-subtitle" placeholder="VD: Kết bạn với mình nhé" />
+              </div>
+            </div>
+
+            <button id="btn-add-link" class="primary-btn full-width">
+              <i class="fa-solid fa-plus"></i> Thêm vào danh sách
+            </button>
+          </div>
+
+          <div class="form-group" style="margin-top: 16px;">
+            <label for="layout-style-select">Kiểu hiển thị liên kết trên trang</label>
+            <select id="layout-style-select">
+              <option value="both">Hiện cả hàng Icon phát sáng + Thẻ danh sách chi tiết (Khuyên dùng)</option>
+              <option value="cards">Chỉ hiện Thẻ danh sách chi tiết</option>
+              <option value="icons">Chỉ hiện hàng Icon tối giản (Chuẩn guns.lol gọn)</option>
+            </select>
+          </div>
+
+          <div class="links-editor-header">
+            <h3>Danh sách liên kết của bạn (<span id="links-count">0</span>)</h3>
+            <span class="helper-text">Kéo/bấm mũi tên để đổi thứ tự</span>
+          </div>
+          <div id="editor-links-list" class="editor-links-list"></div>
+        </div>
+
+        <!-- TAB 2: PROFILE INFO -->
+        <div id="tab-profile" class="tab-pane">
+          <div class="form-group">
+            <label for="input-name">Tên hiển thị (Display Name)</label>
+            <input type="text" id="input-name" placeholder="linhmeooo" />
+          </div>
+
+          <div class="form-group">
+            <label for="input-username">Username / Tag</label>
+            <input type="text" id="input-username" placeholder="@linhmeooo" />
+          </div>
+
+          <div class="form-group">
+            <label for="input-bio">Lời giới thiệu (Bio)</label>
+            <textarea id="input-bio" rows="2" placeholder="Nhập lời giới thiệu bản thân..."></textarea>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="input-views">Số lượt xem hiển thị</label>
+              <input type="number" id="input-views" min="0" placeholder="1428" />
+            </div>
+            <div class="form-group">
+              <label for="input-status">Trạng thái hiện tại (Status Box)</label>
+              <input type="text" id="input-status" placeholder="Coding & listening to music 🎧" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Ảnh đại diện (Avatar)</label>
+            <div class="media-picker-row">
+              <input type="url" id="input-avatar-url" placeholder="Dán link ảnh Avatar (https://...)" />
+              <label class="upload-btn">
+                <i class="fa-solid fa-upload"></i> Tải ảnh từ máy
+                <input type="file" id="file-avatar" accept="image/*" hidden />
+              </label>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Huy hiệu nổi bật (Badges)</label>
+            <div class="checkbox-grid">
+              <label class="check-pill"><input type="checkbox" value="verified" class="badge-checkbox" /> <i class="fa-solid fa-circle-check"></i> Verified</label>
+              <label class="check-pill"><input type="checkbox" value="developer" class="badge-checkbox" /> <i class="fa-solid fa-code"></i> Developer</label>
+              <label class="check-pill"><input type="checkbox" value="premium" class="badge-checkbox" /> <i class="fa-solid fa-gem"></i> Premium</label>
+              <label class="check-pill"><input type="checkbox" value="gamer" class="badge-checkbox" /> <i class="fa-solid fa-gamepad"></i> Gamer</label>
+              <label class="check-pill"><input type="checkbox" value="music" class="badge-checkbox" /> <i class="fa-solid fa-headphones"></i> Music Lover</label>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: BACKGROUND & EFFECTS -->
+        <div id="tab-bg" class="tab-pane">
+          <div class="form-group">
+            <label for="select-bg-type">Loại hình nền</label>
+            <select id="select-bg-type">
+              <option value="image">Ảnh nền (JPG, PNG, GIF, WebP)</option>
+              <option value="video">Video nền chuyển động (MP4, WebM)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Đường dẫn Ảnh / Video nền hoặc Tải từ máy</label>
+            <div class="media-picker-row">
+              <input type="url" id="input-bg-url" placeholder="Dán URL ảnh hoặc video nền..." />
+              <label class="upload-btn">
+                <i class="fa-solid fa-upload"></i> Chọn file ảnh
+                <input type="file" id="file-bg" accept="image/*" hidden />
+              </label>
+            </div>
+            <span class="helper-text">Gợi ý kho nền đẹp bên dưới (Bấm để chọn nhanh):</span>
+            <div class="preset-bg-grid" id="preset-bg-grid">
+              <button type="button" class="preset-thumb" data-type="image" data-url="https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1920&q=80" style="background-image: url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=300&q=60')"><span>Cyber Dark</span></button>
+              <button type="button" class="preset-thumb" data-type="image" data-url="https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1920&q=80" style="background-image: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=300&q=60')"><span>Night Sky</span></button>
+              <button type="button" class="preset-thumb" data-type="image" data-url="https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1920&q=80" style="background-image: url('https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=300&q=60')"><span>Neon Tokyo</span></button>
+              <button type="button" class="preset-thumb" data-type="image" data-url="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=1920&q=80" style="background-image: url('https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=300&q=60')"><span>Retro Synth</span></button>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="range-bg-blur">Độ mờ ảnh nền (Blur): <span id="val-bg-blur">4px</span></label>
+              <input type="range" id="range-bg-blur" min="0" max="20" value="4" />
+            </div>
+            <div class="form-group">
+              <label for="range-bg-dim">Độ tối nền (Dim): <span id="val-bg-dim">45%</span></label>
+              <input type="range" id="range-bg-dim" min="10" max="90" value="45" />
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="input-accent-color">Màu phát sáng chủ đạo (Neon Glow)</label>
+              <div class="color-picker-wrap">
+                <input type="color" id="input-accent-color" value="#a855f7" />
+                <span id="accent-color-hex">#a855f7</span>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="range-card-opacity">Độ trong suốt khung kính: <span id="val-card-opacity">35%</span></label>
+              <input type="range" id="range-card-opacity" min="10" max="85" value="35" />
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="select-particles">Hiệu ứng hạt rơi (Particles)</label>
+              <select id="select-particles">
+                <option value="snow">Tuyết rơi nhẹ (Snow)</option>
+                <option value="fireflies">Đom đóm phát sáng (Fireflies)</option>
+                <option value="stars">Sao lấp lánh (Starfield)</option>
+                <option value="none">Tắt hiệu ứng hạt</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="input-enter-text">Chữ màn hình chờ (Click to Enter)</label>
+              <input type="text" id="input-enter-text" placeholder="click to enter..." />
+            </div>
+          </div>
+
+          <div class="checkbox-grid" style="margin-top: 8px;">
+            <label class="check-pill">
+              <input type="checkbox" id="check-3d-tilt" checked /> Hiệu ứng nghiêng 3D khi di chuột
+            </label>
+            <label class="check-pill">
+              <input type="checkbox" id="check-typewriter" checked /> Hiệu ứng gõ chữ (Typewriter Bio)
+            </label>
+          </div>
+        </div>
+
+        <!-- TAB 4: AUDIO / MUSIC -->
+        <div id="tab-music" class="tab-pane">
+          <div class="form-group">
+            <label class="check-pill" style="width: fit-content;">
+              <input type="checkbox" id="check-audio-enabled" checked /> Hiển thị trình phát nhạc & phát nhạc nền
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label>Nguồn nhạc: Dán link <strong>YouTube</strong>, link <strong>MP3</strong> hoặc Chọn file từ máy</label>
+            <div class="media-picker-row">
+              <input type="url" id="input-audio-url" placeholder="Dán link YouTube (https://youtu.be/...) hoặc link MP3..." />
+              <label class="upload-btn">
+                <i class="fa-solid fa-file-audio"></i> Chọn file MP3
+                <input type="file" id="file-audio" accept="audio/*" hidden />
+              </label>
+            </div>
+            <span class="helper-text">✨ Khi dán link <strong>YouTube</strong>, hệ thống sẽ tự động lấy tên bài hát, tên kênh và ảnh bìa! Hoặc chọn nhanh bên dưới:</span>
+            <div class="preset-music-list">
+              <button type="button" class="preset-music-btn" data-title="Lofi Chill Night" data-artist="Chillhop Music" data-url="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3">
+                <i class="fa-solid fa-compact-disc"></i> Lofi Chill (MP3)
+              </button>
+              <button type="button" class="preset-music-btn" data-title="Synthwave Dreams" data-artist="Cyberpunk Beats" data-url="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a73467.mp3">
+                <i class="fa-solid fa-compact-disc"></i> Synthwave (MP3)
+              </button>
+              <button type="button" class="preset-music-btn" data-title="Ambient Piano Rain" data-artist="Peaceful Melody" data-url="https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3">
+                <i class="fa-solid fa-compact-disc"></i> Ambient Piano (MP3)
+              </button>
+              <button type="button" class="preset-music-btn" data-title="lofi hip hop radio" data-artist="Lofi Girl (YouTube)" data-url="https://www.youtube.com/watch?v=jfKfPfyJRdk">
+                <i class="fa-brands fa-youtube" style="color: #ef4444;"></i> Lofi Girl (YouTube)
+              </button>
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="input-audio-title">Tên bài hát</label>
+              <input type="text" id="input-audio-title" placeholder="Lofi Chill Night" />
+            </div>
+            <div class="form-group">
+              <label for="input-audio-artist">Nghệ sĩ / Mô tả</label>
+              <input type="text" id="input-audio-artist" placeholder="Chillhop Music" />
+            </div>
+          </div>
+
+          <div class="form-row-2">
+            <div class="form-group">
+              <label for="input-audio-cover">Link ảnh bìa bài hát (Album Cover)</label>
+              <input type="url" id="input-audio-cover" placeholder="https://..." />
+            </div>
+            <div class="form-group">
+              <label for="range-audio-volume">Âm lượng mặc định: <span id="val-audio-volume">50%</span></label>
+              <input type="range" id="range-audio-volume" min="5" max="100" value="50" />
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 5: EXPORT & GITHUB PAGES -->
+        <div id="tab-publish" class="tab-pane">
+          <div class="publish-guide-box">
+            <h3><i class="fa-brands fa-github"></i> Cách đưa lên GitHub Pages để ai bấm vào cũng xem được</h3>
+            <ol class="guide-steps">
+              <li>Chỉnh sửa giao diện, ảnh nền, nhạc và các link ở các tab bên cạnh cho thật ưng ý (Mọi thay đổi đang được lưu tự động trên trình duyệt của bạn).</li>
+              <li>Bấm nút <strong>"Tải xuống file config.json"</strong> bên dưới và lưu đè vào thư mục code của bạn (hoặc copy nội dung JSON dán vào file <code>config.json</code> trên GitHub).</li>
+              <li>Đẩy bộ file (<code>index.html</code>, <code>style.css</code>, <code>app.js</code>, <code>config.json</code>) lên GitHub Repository của bạn và bật <strong>Settings &rarr; Pages</strong>.</li>
+              <li><em>Mẹo:</em> Khi gửi link cho người khác, nút "Tùy chỉnh" có thể ẩn đi hoặc bạn thêm <code>?edit=1</code> vào cuối link khi muốn mở bảng cài đặt!</li>
+            </ol>
+
+            <div class="publish-actions">
+              <button id="btn-export-json" class="primary-btn">
+                <i class="fa-solid fa-download"></i> Tải xuống file config.json
+              </button>
+              <button id="btn-copy-json" class="secondary-btn">
+                <i class="fa-regular fa-copy"></i> Copy nội dung JSON
+              </button>
+              <label class="secondary-btn upload-json-label">
+                <i class="fa-solid fa-file-import"></i> Nhập file config.json
+                <input type="file" id="file-import-json" accept=".json" hidden />
+              </label>
+              <button id="btn-reset-default" class="danger-btn">
+                <i class="fa-solid fa-rotate-left"></i> Khôi phục mặc định
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Application Script -->
+  <script src="./app.js"></script>
+</body>
+</html>
+
