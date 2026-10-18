@@ -263,6 +263,21 @@ function hexToRgbString(hex) {
  * 3. Fallback to DEFAULT_CONFIG
  */
 async function loadConfig() {
+  const isHostedSite = window.location.protocol.startsWith('http');
+
+  if (isHostedSite) {
+    try {
+      const response = await fetch(`./config.json?t=${Date.now()}`, { cache: 'no-store' });
+      if (response.ok) {
+        const remoteConfig = await response.json();
+        state = mergeConfig(DEFAULT_CONFIG, remoteConfig);
+        return;
+      }
+    } catch {
+      // Fallback to localStorage or DEFAULT_CONFIG
+    }
+  }
+
   try {
     const savedLocal = localStorage.getItem(STORAGE_KEY);
     if (savedLocal) {
@@ -274,16 +289,7 @@ async function loadConfig() {
     console.warn('Could not read localStorage config:', err);
   }
 
-  try {
-    const response = await fetch('./config.json', { cache: 'no-store' });
-    if (response.ok) {
-      const remoteConfig = await response.json();
-      state = mergeConfig(DEFAULT_CONFIG, remoteConfig);
-    }
-  } catch {
-    // Running via file:// protocol or offline — use DEFAULT_CONFIG silently
-    state = structuredClone(DEFAULT_CONFIG);
-  }
+  state = structuredClone(DEFAULT_CONFIG);
 }
 
 function mergeConfig(base, incoming) {
@@ -296,9 +302,26 @@ function mergeConfig(base, incoming) {
   };
 }
 
+function syncLocalToBridge() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    if (window.location.hostname.endsWith('.github.io')) return;
+    fetch('http://127.0.0.1:18100/sync', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'text/plain;charset=UTF-8' },
+      body: raw
+    }).catch(() => {});
+  } catch {
+    // Ignore when local bridge is not running
+  }
+}
+
 function saveConfigToLocal() {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    syncLocalToBridge();
   } catch (err) {
     showToast('⚠️ Ảnh quá lớn để lưu vào bộ nhớ trình duyệt, hãy dùng link ảnh hoặc ảnh nhẹ hơn.');
     console.error('Storage quota exceeded:', err);
@@ -1529,6 +1552,7 @@ function showToast(message) {
 document.addEventListener('DOMContentLoaded', async () => {
   loadYouTubeApiIfNeeded();
   await loadConfig();
+  syncLocalToBridge();
   renderAll();
   setupAudioEvents();
   setup3DTilt();
