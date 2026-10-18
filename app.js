@@ -1154,14 +1154,27 @@ function syncEditorInputs() {
   document.getElementById('val-audio-volume').textContent = `${volPercent}%`;
 }
 
+function isLocalOwnerEnvironment() {
+  const proto = window.location.protocol;
+  const host = window.location.hostname;
+  return proto === 'file:' || host === 'localhost' || host === '127.0.0.1';
+}
+
 /**
  * Setup Studio Editor Drawer & Real-time Auto-Icon Detection
+ * Strictly restricted to local owner environment (file:// or localhost)
  */
 function setupEditorEvents() {
   const drawer = document.getElementById('editor-drawer');
   const openBtn = document.getElementById('btn-open-editor');
   const closeBtn = document.getElementById('btn-close-editor');
   const backdrop = document.getElementById('editor-backdrop');
+
+  if (!isLocalOwnerEnvironment()) {
+    if (openBtn) openBtn.remove();
+    if (drawer) drawer.remove();
+    return;
+  }
 
   openBtn.addEventListener('click', () => drawer.classList.remove('hidden'));
   closeBtn.addEventListener('click', () => drawer.classList.add('hidden'));
